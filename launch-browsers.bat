@@ -1,33 +1,52 @@
-@ECHO off && SETLOCAL EnableDelayedExpansion
+@ECHO off && SETLOCAL EnableExtensions EnableDelayedExpansion
 
-@REM Purpose: To automate opening of specific tabs in a given browser from an x86 machine.
+:: Purpose: To automate opening of commonly-visited URLs in a modern web browser.
+
+:: Note: 
+:: 	* Browser must be installed and available locally.
+:: 		*** You can test this by opening a command line and running `start chrome` or `start firefox` ***
 
 
-:: Add or remove URLs to these lists. Keep a single space between each element.
+:: Other tips:
+:: 	* When in doubt, remove a whitespace.
+:: 	* If unsure, put your values in double-quotation marks.
 
-:: NOTE: Don't add a space before or after the equals sign or it won't execute.
 
-:: NOTE NOTE: Ampersands and special characters, so we added a caret to the YouTube link
-:: in order to stem unusual behavior and error messages. The link works fine
-:: without the escape, but that might not always be the case.
-SET ChromeURLs=https://www.python.org/
-SET FirefoxURLs=https://pypi.org/search/?q=rref
+:: *** Chrome URLs ***
+SET ChromeURLs="https://www.python.org/"
+
+
+:: *** Firefox URLs *** 
+:: We can set variable values individually, too.
+:: Just switch current URLs for whichever you'd like to have the browser open.
+SET FirefoxURLs="https://www.google.com/"
+SET FirefoxURLs=%FirefoxURLs% "https://pypi.org/search/?q=rref"
+
+
 
 :: Deermine which browsers to open when you run the file.
-:: Since we're just capturing the first letter, you can use y or n, but
-:: yes or no keeps things clear.
+:: Values can be:
+:: 	y
+:: 	n
+:: 	yes
+:: 	no
 SET ChromeYN=yes
 SET FirefoxYN=yes
 
 
-:: Get first letter of our selections. The syntax is roughtly `:~<start>,<number of characters>`
-:: I don't believe this can be dynamically evaluated, so we can just set it to a variable
-:: and check it in a sec.
-SET chr_res=%ChromeYN:~0,1%
-SET ff_res=%FirefoxYN:~0,1%
+:: Get first character from our browser options.
+CALL :FirstChar %ChromeYN% chr_res
+CALL :FirstChar %FirefoxYN% ff_res
 
 
-:: Evaluate results and asynchronously start each program with a brief 1 second pause
+:: Check results (if debugging)
+REM ECHO Chrome value %chr_res%
+REM ECHO Firefox value %ff_res%
+REM PAUSE
+REM GOTO :eof
+
+
+:: Evaluate results and start each program with a 1 second pause to allow for processing.
 If "!chr_res!"=="y" (
 
     :: To start a current instance of Chrome, remove `--new-window`
@@ -44,3 +63,9 @@ If "!chr_res!"=="y" (
         GOTO :EOF
     )
 )
+
+
+:: Function to get first character from string variable value.
+:FirstChar
+SET first=%~1
+SET "%~2=%first:~0,1%"
